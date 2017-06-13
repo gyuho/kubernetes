@@ -339,8 +339,14 @@ function compute-etcd-events-params {
 function compute-kube-apiserver-params {
 	local params="${APISERVER_TEST_ARGS:-}"
 	params+=" --insecure-bind-address=0.0.0.0"
-	params+=" --etcd-servers=http://127.0.0.1:2379"
-	params+=" --etcd-servers-overrides=/events#${EVENT_STORE_URL}"
+	if [ -z "${ETCD_SERVERS}" ]; then
+		params+=" --etcd-servers=http://127.0.0.1:2379"
+	else
+		params+=" --etcd-servers=${ETCD_SERVERS}"
+	fi
+	if [ -z "${EVENT_STORE_URL}" ]; then
+		params+=" --etcd-servers-overrides=/events#${EVENT_STORE_URL}"
+	fi
 	params+=" --tls-cert-file=/etc/srv/kubernetes/server.cert"
 	params+=" --tls-private-key-file=/etc/srv/kubernetes/server.key"
 	params+=" --client-ca-file=/etc/srv/kubernetes/ca.crt"
